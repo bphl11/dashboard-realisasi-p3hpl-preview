@@ -253,18 +253,52 @@ function tampilkanMonitoringDashboard(items) {
     const container = document.getElementById("monitoringDashboard");
     if (!container) return;
 
+    // Ranking 10 realisasi terendah berdasarkan persentase penyerapan.
+    // Gunakan tie-breaker nominal realisasi agar urutan tetap konsisten
+    // apabila dua kelompok memiliki persentase yang sama.
     const groups = buatKelompokDashboard(items, ["komponen", "subKomponen"])
-        .sort(function (a, b) { return b.total.realisasi - a.total.realisasi; })
+        .sort(function (a, b) {
+            const persenA = Number(a.total.persen) || 0;
+            const persenB = Number(b.total.persen) || 0;
+
+            if (persenA !== persenB) {
+                return persenA - persenB;
+            }
+
+            return (Number(a.total.realisasi) || 0) -
+                (Number(b.total.realisasi) || 0);
+        })
         .slice(0, 10);
 
-    container.innerHTML = '<div class="table-responsive dashboard-table-wrap"><table class="table dashboard-table align-middle mb-0">' +
-        '<thead><tr><th>Komponen</th><th>Sub Komponen</th><th class="text-end">Pagu</th><th class="text-end">Realisasi</th><th class="text-end">%</th></tr></thead>' +
-        '<tbody>' +
-        (groups.length ? groups.map(function (group) {
-            const total = group.total;
-            return '<tr><td>' + escapeHtmlDashboard(group.values[0]) + '</td><td>' + escapeHtmlDashboard(group.values[1]) + '</td><td class="text-end">' + formatRupiahDashboard(total.pagu) + '</td><td class="text-end text-success fw-semibold">' + formatRupiahDashboard(total.realisasi) + '</td><td class="text-end">' + formatPersenDashboard(total.persen) + '</td></tr>';
-        }).join("") : '<tr><td colspan="5" class="text-center text-muted py-4">Tidak ada data Normal.</td></tr>') +
-        '</tbody></table></div>';
+    container.innerHTML =
+        '<div class="table-responsive dashboard-table-wrap"><table class="table dashboard-table align-middle mb-0">' +
+            '<thead><tr>' +
+                '<th class="text-center">Peringkat</th>' +
+                '<th>Komponen</th>' +
+                '<th>Sub Komponen</th>' +
+                '<th class="text-end">Pagu</th>' +
+                '<th class="text-end">Realisasi</th>' +
+                '<th class="text-end">%</th>' +
+            '</tr></thead>' +
+            '<tbody>' +
+            (groups.length
+                ? groups.map(function (group, index) {
+                    const total = group.total;
+
+                    return '<tr>' +
+                        '<td class="text-center fw-semibold">' + (index + 1) + '</td>' +
+                        '<td>' + escapeHtmlDashboard(group.values[0]) + '</td>' +
+                        '<td>' + escapeHtmlDashboard(group.values[1]) + '</td>' +
+                        '<td class="text-end">' + formatRupiahDashboard(total.pagu) + '</td>' +
+                        '<td class="text-end text-success fw-semibold">' + formatRupiahDashboard(total.realisasi) + '</td>' +
+                        '<td class="text-end"><span class="percent-pill">' +
+                            formatPersenDashboard(total.persen) +
+                        '</span></td>' +
+                    '</tr>';
+                }).join("")
+                : '<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada data Normal.</td></tr>') +
+            '</tbody>' +
+        '</table></div>';
 }
 
 function tampilkanErrorDashboard(error) {
