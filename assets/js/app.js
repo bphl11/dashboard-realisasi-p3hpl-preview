@@ -19,6 +19,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             ? parseDataMonitoring(dashboardRawData)
             : [];
 
+        // Kode Sub Komponen dipakai khusus untuk tata letak Dashboard.
+        // Tidak mengubah Calculation Engine maupun nilai anggaran.
+        lengkapiKodeSubKomponenDashboard(
+            dashboardParsedData,
+            dashboardRawData
+        );
+
         const normalData = dashboardParsedData.filter(function (item) {
             return item && item.statusPagu === "Normal";
         });
@@ -45,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         tampilkanGrafikBulananDashboard(normalData);
         tampilkanKomponenDashboard(normalData);
         tampilkanSubKomponenDashboard(normalData);
-        tampilkanMonitoringDashboard(normalData);
+        tampilkanDiagramAkunBelanjaDashboard(normalData);
 
     } catch (error) {
         console.error("ERROR DASHBOARD:", error);
@@ -156,6 +163,7 @@ function tampilkanGrafikBulananDashboard(items) {
             const height = value > 0 ? Math.max((value / maksimum) * 100, 2) : 0;
             return '<div class="month-column">' +
                 '<div class="month-tooltip">' + escapeHtmlDashboard(nama) + '<br><strong>' + formatRupiahDashboard(value) + '</strong></div>' +
+                '<div class="month-value">' + formatSingkatRupiahDashboard(value) + '</div>' +
                 '<div class="month-bar-area"><div class="month-bar" style="height:' + height + '%"></div></div>' +
                 '<div class="month-name">' + escapeHtmlDashboard(nama.substring(0, 3)) + '</div>' +
             '</div>';
@@ -195,18 +203,20 @@ function tampilkanKomponenDashboard(items) {
     const count = document.getElementById("jumlahKomponen");
     if (!container) return;
 
-    const groups = buatKelompokDashboard(items, ["komponen"])
+    const groups = buatKelompokDashboard(items, ["kodeKomponen", "komponen"])
         .sort(function (a, b) { return b.total.realisasi - a.total.realisasi; });
 
     if (count) count.textContent = groups.length + " Komponen";
 
     container.innerHTML = groups.length
         ? groups.map(function (group) {
-            const nama = group.values[0];
+            const kode = group.values[0] === "Tidak Teridentifikasi" ? "" : group.values[0];
+            const nama = group.values[1];
+            const judul = kode ? kode + " - " + nama : nama;
             const total = group.total;
             return '<div class="col-12 col-lg-6 col-xxl-4">' +
                 '<article class="component-card h-100">' +
-                    '<div class="component-card-title"><span class="component-icon"><i class="bi bi-folder2-open"></i></span><h5>' + escapeHtmlDashboard(nama) + '</h5></div>' +
+                    '<div class="component-card-title"><span class="component-icon"><i class="bi bi-folder2-open"></i></span><h5>' + escapeHtmlDashboard(judul) + '</h5></div>' +
                     '<div class="component-metrics">' +
                         metricDashboard("Pagu", formatRupiahDashboard(total.pagu), "metric-blue") +
                         metricDashboard("Realisasi", formatRupiahDashboard(total.realisasi), "metric-green") +
@@ -224,83 +234,199 @@ function metricDashboard(label, value, className) {
     return '<div class="metric-item ' + className + '"><span>' + label + '</span><strong>' + value + '</strong></div>';
 }
 
+function lengkapiKodeSubKomponenDashboard(items, rawData) {
+    if (!Array.isArray(items) || !Array.isArray(rawData)) return;
+
+    const context = typeof konteksDataAplikasi === "function"
+        ? konteksDataAplikasi(rawData)
+        : null;
+
+    if (!context || typeof nilaiHeaderDataAplikasi !== "function") return;
+
+    items.forEach(function (item) {
+        if (!item || !Number.isInteger(item.rowIndex)) return;
+
+        const row = Array.isArray(rawData[item.rowIndex])
+            ? rawData[item.rowIndex]
+            : [];
+
+        const kode = nilaiHeaderDataAplikasi(row, context.map, [
+            "Kode Sub Komponen",
+            "Kode Subkomponen",
+            "KodeSubKomponen"
+        ]);
+
+        item.kodeSubKomponen = kode || item.kodeSubKomponen || "-";
+    });
+}
+
+function bandingkanTeksDashboard(a, b) {
+    return String(a ?? "").localeCompare(
+        String(b ?? ""),
+        "id",
+        { numeric: true, sensitivity: "base" }
+    );
+}
+
 function tampilkanSubKomponenDashboard(items) {
     const container = document.getElementById("dashboardSubKomponen");
     const count = document.getElementById("jumlahSubKomponen");
     if (!container) return;
 
-    const groups = buatKelompokDashboard(items, ["komponen", "subKomponen"])
-        .sort(function (a, b) { return b.total.realisasi - a.total.realisasi; });
+    const groups = buatKelompokDashboard(items, [
+        "kodeKomponen",
+        "komponen",
+        "kodeSubKomponen",
+        "subKomponen"
+    ]).sort(function (a, b) {
+        return (
+            bandingkanTeksDashboard(a.values[0], b.values[0]) ||
+            bandingkanTeksDashboard(a.values[1], b.values[1]) ||
+            bandingkanTeksDashboard(a.values[2], b.values[2]) ||
+            bandingkanTeksDashboard(a.values[3], b.values[3])
+        );
+    });
 
     if (count) count.textContent = groups.length + " Sub Komponen";
 
+    const componentGroups = new Map();
+
+    groups.forEach(function (group) {
+        const kodeKomponen = group.values[0] === "Tidak Teridentifikasi"
+            ? "-"
+            : group.values[0];
+
+        const namaKomponen = group.values[1];
+        const key = kodeKomponen + "||" + namaKomponen;
+
+        if (!componentGroups.has(key)) {
+            componentGroups.set(key, {
+                kode: kodeKomponen,
+                nama: namaKomponen,
+                subKomponen: []
+            });
+        }
+
+        componentGroups.get(key).subKomponen.push(group);
+    });
+
     container.innerHTML = groups.length
-        ? groups.map(function (group) {
-            const total = group.total;
-            return '<tr>' +
-                '<td class="component-cell">' + escapeHtmlDashboard(group.values[0]) + '</td>' +
-                '<td class="subcomponent-cell">' + escapeHtmlDashboard(group.values[1]) + '</td>' +
-                '<td class="text-end">' + formatRupiahDashboard(total.pagu) + '</td>' +
-                '<td class="text-end text-success fw-semibold">' + formatRupiahDashboard(total.realisasi) + '</td>' +
-                '<td class="text-end text-danger-emphasis">' + formatRupiahDashboard(total.sisa) + '</td>' +
-                '<td class="text-end"><span class="percent-pill">' + formatPersenDashboard(total.persen) + '</span></td>' +
-            '</tr>';
+        ? Array.from(componentGroups.values()).map(function (component) {
+            const kodeKomponen = component.kode && component.kode !== "-"
+                ? component.kode + " - "
+                : "";
+
+            const componentHeader =
+                '<tr class="component-group-row">' +
+                    '<td colspan="6">' +
+                        '<span class="component-group-label">Komponen</span>' +
+                        '<strong>' +
+                            escapeHtmlDashboard(kodeKomponen + component.nama) +
+                        '</strong>' +
+                    '</td>' +
+                '</tr>';
+
+            const rows = component.subKomponen.map(function (group) {
+                const total = group.total;
+                const kodeSub = group.values[2] === "Tidak Teridentifikasi"
+                    ? ""
+                    : group.values[2];
+
+                const namaSub = group.values[3];
+                const subLabel = kodeSub
+                    ? kodeSub + " - " + namaSub
+                    : namaSub;
+
+                return '<tr>' +
+                    '<td class="subcomponent-indent"><span class="subcomponent-marker"><i class="bi bi-arrow-return-right"></i></span></td>' +
+                    '<td class="subcomponent-cell">' + escapeHtmlDashboard(subLabel) + '</td>' +
+                    '<td class="text-end">' + formatRupiahDashboard(total.pagu) + '</td>' +
+                    '<td class="text-end text-success fw-semibold">' + formatRupiahDashboard(total.realisasi) + '</td>' +
+                    '<td class="text-end text-danger-emphasis">' + formatRupiahDashboard(total.sisa) + '</td>' +
+                    '<td class="text-end"><span class="percent-pill">' + formatPersenDashboard(total.persen) + '</span></td>' +
+                '</tr>';
+            }).join("");
+
+            return componentHeader + rows;
         }).join("")
         : '<tr><td colspan="6" class="text-center text-muted py-4">Data sub komponen belum tersedia.</td></tr>';
 }
 
-function tampilkanMonitoringDashboard(items) {
-    const container = document.getElementById("monitoringDashboard");
+function tampilkanDiagramAkunBelanjaDashboard(items) {
+    const container = document.getElementById("diagramAkunBelanjaDashboard");
     if (!container) return;
 
-    // Ranking 10 realisasi terendah berdasarkan persentase penyerapan.
-    // Gunakan tie-breaker nominal realisasi agar urutan tetap konsisten
-    // apabila dua kelompok memiliki persentase yang sama.
-    const groups = buatKelompokDashboard(items, ["komponen", "subKomponen"])
+    const groups = buatKelompokDashboard(items, ["akun", "itemAkun"])
         .sort(function (a, b) {
-            const persenA = Number(a.total.persen) || 0;
-            const persenB = Number(b.total.persen) || 0;
+            return bandingkanTeksDashboard(a.values[0], b.values[0]) ||
+                bandingkanTeksDashboard(a.values[1], b.values[1]);
+        });
 
-            if (persenA !== persenB) {
-                return persenA - persenB;
-            }
+    if (!groups.length) {
+        container.innerHTML = '<div class="empty-dashboard">Tidak ada data akun belanja dengan status Normal.</div>';
+        return;
+    }
 
-            return (Number(a.total.realisasi) || 0) -
-                (Number(b.total.realisasi) || 0);
-        })
-        .slice(0, 10);
+    const akunMap = new Map();
 
-    container.innerHTML =
-        '<div class="table-responsive dashboard-table-wrap"><table class="table dashboard-table align-middle mb-0">' +
-            '<thead><tr>' +
-                '<th class="text-center">Peringkat</th>' +
-                '<th>Komponen</th>' +
-                '<th>Sub Komponen</th>' +
-                '<th class="text-end">Pagu</th>' +
-                '<th class="text-end">Realisasi</th>' +
-                '<th class="text-end">%</th>' +
-            '</tr></thead>' +
-            '<tbody>' +
-            (groups.length
-                ? groups.map(function (group, index) {
-                    const total = group.total;
+    groups.forEach(function (group) {
+        const akun = group.values[0];
+        if (!akunMap.has(akun)) akunMap.set(akun, []);
+        akunMap.get(akun).push(group);
+    });
 
-                    return '<tr>' +
-                        '<td class="text-center fw-semibold">' + (index + 1) + '</td>' +
-                        '<td>' + escapeHtmlDashboard(group.values[0]) + '</td>' +
-                        '<td>' + escapeHtmlDashboard(group.values[1]) + '</td>' +
-                        '<td class="text-end">' + formatRupiahDashboard(total.pagu) + '</td>' +
-                        '<td class="text-end text-success fw-semibold">' + formatRupiahDashboard(total.realisasi) + '</td>' +
-                        '<td class="text-end"><span class="percent-pill">' +
-                            formatPersenDashboard(total.persen) +
-                        '</span></td>' +
-                    '</tr>';
-                }).join("")
-                : '<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada data Normal.</td></tr>') +
-            '</tbody>' +
-        '</table></div>';
+    container.innerHTML = Array.from(akunMap.entries()).map(function (entry) {
+        const akun = entry[0];
+        const itemGroups = entry[1];
+        const labels = itemGroups.map(function (group) {
+            return group.values[1] && group.values[1] !== "Tidak Teridentifikasi"
+                ? group.values[1]
+                : "Tanpa Item Akun";
+        });
+
+        return '<article class="akun-chart-card">' +
+            '<div class="akun-chart-header">' +
+                '<div><span class="akun-chart-kicker">Akun Belanja</span><h5><i class="bi bi-wallet2"></i> ' +
+                escapeHtmlDashboard(akun) +
+                '</h5></div>' +
+                '<span class="akun-chart-count">' + itemGroups.length + ' Item Akun</span>' +
+            '</div>' +
+            '<div class="akun-chart-grid">' +
+                buatDiagramAkunDashboard("Pagu", "Pagu seluruh " + akun, labels, itemGroups.map(function (g) { return g.total.pagu; }), "chart-pagu") +
+                buatDiagramAkunDashboard("Realisasi", "Realisasi seluruh " + akun, labels, itemGroups.map(function (g) { return g.total.realisasi; }), "chart-realisasi") +
+                buatDiagramAkunDashboard("Sisa", "Sisa anggaran seluruh " + akun, labels, itemGroups.map(function (g) { return g.total.sisa; }), "chart-sisa") +
+            '</div>' +
+        '</article>';
+    }).join("");
 }
 
+function buatDiagramAkunDashboard(title, subtitle, labels, values, className) {
+    const maksimum = Math.max.apply(null, values.concat([1]));
+
+    const rows = labels.map(function (label, index) {
+        const value = Number(values[index]) || 0;
+        const width = value > 0 ? Math.max((value / maksimum) * 100, 1.5) : 0;
+
+        return '<div class="akun-bar-row">' +
+            '<div class="akun-bar-label" title="' + escapeHtmlDashboard(label) + '">' +
+                escapeHtmlDashboard(label) +
+            '</div>' +
+            '<div class="akun-bar-track">' +
+                '<div class="akun-bar ' + className + '" style="width:' + width + '%">' +
+                    (width >= 12 ? '<span>' + formatSingkatRupiahDashboard(value) + '</span>' : '') +
+                '</div>' +
+                (width < 12 ? '<span class="akun-bar-outside">' + formatSingkatRupiahDashboard(value) + '</span>' : '') +
+            '</div>' +
+        '</div>';
+    }).join("");
+
+    return '<section class="akun-mini-chart">' +
+        '<div class="akun-mini-chart-title"><strong>' + escapeHtmlDashboard(title) + '</strong><span>' +
+            escapeHtmlDashboard(subtitle) +
+        '</span></div>' +
+        '<div class="akun-bars">' + rows + '</div>' +
+    '</section>';
+}
 function tampilkanErrorDashboard(error) {
     const message = escapeHtmlDashboard(error && error.message ? error.message : "Terjadi kesalahan.");
     ["grafikBulanan","dashboardKomponen","monitoringDashboard"].forEach(function (id) {
@@ -311,6 +437,24 @@ function tampilkanErrorDashboard(error) {
 
 function formatRupiahDashboard(value) {
     return "Rp" + Math.round(Number(value) || 0).toLocaleString("id-ID");
+}
+
+function formatSingkatRupiahDashboard(value) {
+    const number = Math.round(Number(value) || 0);
+
+    if (number >= 1000000000) {
+        return "Rp" + (number / 1000000000).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " M";
+    }
+
+    if (number >= 1000000) {
+        return "Rp" + (number / 1000000).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " Jt";
+    }
+
+    if (number >= 1000) {
+        return "Rp" + (number / 1000).toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " Rb";
+    }
+
+    return "Rp" + number.toLocaleString("id-ID");
 }
 
 function formatPersenDashboard(value) {
