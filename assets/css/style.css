@@ -605,3 +605,252 @@ body:before{
     .section-title{display:block}
     .section-count{display:inline-block;margin-top:8px}
 }
+
+
+/* ==========================================================
+   VISUAL REDESIGN 2026.2 - DASHBOARD PROFESSIONAL COMPACT
+   VISUAL ONLY: seluruh data, ID, struktur dan perhitungan tetap
+   ========================================================== */
+:root{
+    --dash-bg:#eef2f0;
+    --dash-surface:#ffffff;
+    --dash-surface-soft:#f8faf9;
+    --dash-border:#dfe7e2;
+    --dash-text:#1f2b36;
+    --dash-muted:#72808d;
+    --dash-green:#2f6b46;
+    --dash-green-dark:#1f5134;
+    --dash-shadow:0 10px 28px rgba(29,49,39,.055);
+}
+body{background:linear-gradient(180deg,#f5f7f6 0,#edf1ef 100%);}
+.content.dashboard-page{
+    max-width:1540px;
+    padding-top:32px;
+    padding-bottom:46px;
+}
+/* Header lebih tegas dan bersih */
+.dashboard-header{
+    position:relative;
+    padding:0 0 20px;
+    margin-bottom:20px;
+    border-bottom:1px solid var(--dash-border);
+}
+.dashboard-header h2{
+    font-size:2rem;
+    line-height:1.08;
+    font-weight:850;
+    color:var(--dash-text);
+    letter-spacing:-.65px;
+}
+.dashboard-header p{
+    margin-top:7px;
+    color:var(--dash-muted);
+    font-size:.9rem;
+    font-weight:600;
+}
+.dashboard-badge{
+    background:#f4faf5;
+    border:1px solid #cfe0d3;
+    color:var(--dash-green-dark);
+    box-shadow:0 4px 12px rgba(41,87,56,.05);
+}
+/* KPI: lebih kuat sebagai ringkasan utama */
+.dashboard-summary{margin-bottom:4px;}
+.summary-card{
+    min-height:104px;
+    padding:19px 20px;
+    border-radius:18px;
+    border:1px solid var(--dash-border);
+    box-shadow:var(--dash-shadow);
+    background:linear-gradient(145deg,#fff 0%,#fbfcfb 100%);
+}
+.summary-card:before{
+    content:"";
+    position:absolute;
+    width:90px;height:90px;
+    right:-34px;top:-42px;
+    border-radius:50%;
+    background:rgba(47,107,70,.045);
+}
+.summary-card:after{height:4px;}
+.summary-icon{
+    width:50px;height:50px;flex-basis:50px;
+    border-radius:15px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);
+}
+.summary-label{
+    font-size:.75rem;
+    font-weight:750;
+    text-transform:uppercase;
+    letter-spacing:.045em;
+}
+.summary-value{font-size:1.32rem;font-weight:850;}
+/* Semua bagian tampil sebagai panel dengan hierarchy lebih jelas */
+.dashboard-section{
+    position:relative;
+    padding:0;
+    overflow:hidden;
+    border:1px solid var(--dash-border);
+    border-radius:19px;
+    background:var(--dash-surface);
+    box-shadow:var(--dash-shadow);
+}
+.dashboard-section > .section-title{
+    padding:17px 20px 14px;
+    margin:0;
+    background:linear-gradient(180deg,#ffffff,#fbfcfb);
+    border-bottom:1px solid #edf1ef;
+}
+.dashboard-section > .monthly-card,
+.dashboard-section > .component-grid,
+.dashboard-section > .dashboard-table-wrap,
+.dashboard-section > #diagramAkunBelanjaDashboard{
+    margin:0 16px 16px;
+}
+.section-title h4{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:1.02rem;
+    color:var(--dash-text);
+}
+.section-title h4 i{
+    width:31px;height:31px;
+    display:inline-flex;align-items:center;justify-content:center;
+    margin:0;
+    border-radius:9px;
+    background:#eef6ef;
+    color:var(--dash-green);
+    font-size:.9rem;
+}
+.section-title p{padding-left:38px;color:var(--dash-muted);font-size:.76rem;}
+.section-count{
+    align-self:center;
+    padding:6px 11px;
+    border:1px solid #dce9df;
+    background:#f4faf5;
+    color:var(--dash-green-dark);
+}
+/* Grafik diberi area visual yang lebih lega */
+.monthly-card{
+    min-height:286px;
+    padding:15px 10px 0;
+    background:linear-gradient(180deg,#fcfdfc 0%,#f7faf8 100%);
+    border:1px solid #edf1ef;
+    border-radius:14px;
+}
+.monthly-chart{height:252px;gap:12px;border-bottom-color:#dfe7e2;}
+.month-bar-area{height:190px;background:repeating-linear-gradient(to top,transparent 0,transparent 46px,#e8eeea 47px);}
+.month-bar{width:58%;box-shadow:0 5px 12px rgba(47,107,70,.16);}
+.month-value{font-size:.67rem;color:#42604a;}
+.month-name{font-size:.73rem;font-weight:700;color:#66737c;}
+/* Komponen: kartu lebih terstruktur dan mudah dipindai */
+.component-grid{padding-top:2px;}
+.component-card{
+    position:relative;
+    min-height:168px;
+    padding:15px 16px;
+    border-radius:15px;
+    border-color:#dfe7e2;
+    box-shadow:0 5px 14px rgba(25,43,33,.035);
+    transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.component-card:hover{
+    transform:translateY(-2px);
+    border-color:#bdd1c1;
+    box-shadow:0 11px 24px rgba(25,65,39,.09);
+}
+.component-card-title{padding-bottom:10px;margin-bottom:9px;border-bottom:1px solid #edf1ef;}
+.component-card-title h5{font-size:.84rem;line-height:1.35;color:#25333c;}
+.component-icon{width:33px;height:33px;flex-basis:33px;border-radius:10px;}
+.component-metrics{border-top:0;padding-top:0;gap:6px;}
+.metric-item{font-size:.72rem;}
+.metric-item strong{font-size:.76rem;font-weight:800;}
+.progress-label{margin-top:9px;}
+.component-progress{border-radius:999px;overflow:hidden;}
+.component-progress .progress-bar{border-radius:999px;}
+/* Tabel: zebra halus, angka mudah dibaca */
+.dashboard-table-wrap{
+    border-radius:14px;
+    border-color:#dfe7e2;
+    box-shadow:0 2px 8px rgba(25,43,33,.025);
+}
+.dashboard-table{font-size:.77rem;}
+.dashboard-table thead th{
+    position:sticky;top:0;z-index:2;
+    padding:11px 10px;
+    background:#f2f6f3;
+    color:#405049;
+    border-bottom:1px solid #dce5df;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.025em;
+}
+.dashboard-table td{padding:9px 10px;border-color:#edf1ef;}
+.dashboard-table tbody tr:nth-child(even):not(.component-group-row){background:#fbfcfb;}
+.dashboard-table tbody tr:hover:not(.component-group-row){background:#f4f8f5;}
+.dashboard-table .component-group-row td{
+    background:linear-gradient(90deg,#eaf3ec,#f2f7f3)!important;
+    border-top:1px solid #d7e5d9!important;
+    border-bottom:1px solid #d7e5d9!important;
+}
+.component-group-label{background:#d8e9db;color:#285d38;}
+.percent-pill{border-radius:999px;background:#edf6ef;color:#27663b;}
+/* Akun Belanja: tampil sebagai blok analitis yang konsisten */
+#diagramAkunBelanjaDashboard{padding-top:0;}
+.akun-chart-card{
+    padding:0;
+    overflow:hidden;
+    border-radius:16px;
+    border-color:#dfe7e2;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(25,43,33,.025);
+}
+.akun-chart-header{
+    padding:14px 16px;
+    margin:0;
+    background:#f7faf8;
+    border-bottom:1px solid #e4ebe6;
+}
+.akun-chart-kicker{font-size:.63rem;color:#7a8b80;}
+.akun-chart-header h5{font-size:.9rem;color:#263a2e;}
+.akun-chart-count{border:1px solid #d8e6db;background:#eef7f0;}
+.akun-chart-grid{padding:13px 14px 15px;gap:12px;}
+.akun-mini-chart{
+    border-color:#e2e9e4;
+    border-radius:12px;
+    padding:12px;
+    background:#fcfdfc;
+}
+.akun-mini-chart-title{padding-bottom:8px;border-bottom:1px solid #edf1ef;}
+.akun-mini-chart-title strong{font-size:.8rem;}
+.akun-mini-chart-title span{font-size:.65rem;}
+.akun-bar-track{border-radius:999px;min-height:22px;background:#edf1ef;overflow:visible;}
+.akun-bar{height:22px;border-radius:999px;box-shadow:0 2px 6px rgba(30,40,35,.08);}
+/* Sidebar lebih modern tanpa mengubah navigasi */
+.sidebar{width:264px;padding:20px 16px;}
+.logo{padding:14px 10px 18px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.12);}
+.sidebar li{padding:12px 14px;margin-bottom:6px;font-size:.91rem;}
+.sidebar li i{margin-right:7px;opacity:.92;}
+.sidebar li.active{color:#235a38;box-shadow:0 7px 18px rgba(0,0,0,.12);}
+@media(max-width:1199px){
+    .content.dashboard-page{max-width:none;}
+    .summary-card{min-height:96px;}
+    .akun-chart-grid{grid-template-columns:1fr;}
+}
+@media(max-width:991px){
+    .content.dashboard-page{padding:22px 16px 36px;}
+    .dashboard-section > .monthly-card,
+    .dashboard-section > .component-grid,
+    .dashboard-section > .dashboard-table-wrap,
+    .dashboard-section > #diagramAkunBelanjaDashboard{margin-left:12px;margin-right:12px;}
+}
+@media(max-width:575px){
+    .dashboard-header h2{font-size:1.5rem;}
+    .summary-card{min-height:88px;padding:14px;}
+    .summary-icon{width:43px;height:43px;flex-basis:43px;}
+    .summary-value{font-size:1.08rem;}
+    .dashboard-section > .section-title{padding:14px;}
+    .section-title p{padding-left:0;margin-top:6px;}
+    .monthly-chart{min-width:690px;}
+}
