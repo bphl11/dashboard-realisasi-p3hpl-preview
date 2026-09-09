@@ -854,3 +854,444 @@ body{background:linear-gradient(180deg,#f5f7f6 0,#edf1ef 100%);}
     .section-title p{padding-left:0;margin-top:6px;}
     .monthly-chart{min-width:690px;}
 }
+
+
+/* ==========================================================
+   MOBILE & TABLET RESPONSIVE 2026
+   Tujuan: seluruh aplikasi tetap sama, tetapi nyaman di HP.
+   Tidak mengubah data, JavaScript, perhitungan, atau konten.
+   ========================================================== */
+
+/* Tablet: sidebar berubah menjadi navigasi horizontal agar menu tetap tersedia */
+@media (max-width: 991px){
+    .wrapper{
+        display:block;
+        min-height:100vh;
+    }
+
+    .sidebar{
+        display:block !important;
+        position:sticky;
+        top:4px;
+        z-index:1100;
+        width:100% !important;
+        max-width:none;
+        padding:8px 10px 10px;
+        background:linear-gradient(135deg,#285a30 0%,#214d2a 100%);
+        box-shadow:0 8px 22px rgba(18,45,25,.13);
+    }
+
+    .sidebar .logo{
+        display:flex;
+        align-items:center;
+        justify-content:flex-start;
+        gap:9px;
+        padding:4px 6px 8px;
+        margin:0;
+        border-bottom:1px solid rgba(255,255,255,.12);
+        text-align:left;
+    }
+
+    .sidebar .logo-sidebar{
+        width:44px;
+        max-height:44px;
+        object-fit:contain;
+        flex:0 0 auto;
+    }
+
+    .sidebar .logo small{
+        display:block;
+        color:#dce9df;
+        font-size:.72rem;
+        font-weight:700;
+        line-height:1.2;
+    }
+
+    .sidebar ul{
+        display:flex;
+        align-items:center;
+        gap:5px;
+        width:100%;
+        margin:0;
+        padding:9px 0 0;
+        overflow-x:auto;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:none;
+        white-space:nowrap;
+    }
+
+    .sidebar ul::-webkit-scrollbar{
+        display:none;
+    }
+
+    .sidebar li{
+        flex:0 0 auto;
+        margin:0;
+        padding:9px 12px;
+        border-radius:9px;
+        font-size:.78rem;
+        line-height:1;
+    }
+
+    .sidebar li i{
+        margin-right:5px;
+    }
+
+    .sidebar li.active{
+        box-shadow:0 3px 10px rgba(0,0,0,.12);
+    }
+
+    .content,
+    .content.dashboard-page{
+        width:100%;
+        min-width:0;
+        padding:18px 14px 32px;
+    }
+
+    /* Tabel tetap utuh, dapat digeser horizontal di layar sempit */
+    .table-responsive,
+    .dashboard-table-wrap{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .dashboard-table{
+        min-width:760px;
+    }
+}
+
+/* HP: hierarchy lebih ringkas dan nyaman disentuh */
+@media (max-width: 575px){
+    html, body{
+        width:100%;
+        overflow-x:hidden;
+    }
+
+    body{
+        font-size:14px;
+    }
+
+    .sidebar{
+        padding:7px 8px 8px;
+    }
+
+    .sidebar .logo{
+        padding:2px 4px 7px;
+    }
+
+    .sidebar .logo-sidebar{
+        width:38px;
+        max-height:38px;
+    }
+
+    .sidebar .logo small{
+        font-size:.67rem;
+    }
+
+    .sidebar ul{
+        gap:4px;
+        padding-top:7px;
+    }
+
+    .sidebar li{
+        padding:9px 10px;
+        font-size:.72rem;
+        border-radius:8px;
+    }
+
+    .content,
+    .content.dashboard-page{
+        padding:14px 10px 28px;
+    }
+
+    .dashboard-header{
+        padding-bottom:13px;
+        margin-bottom:14px;
+    }
+
+    .dashboard-header h2{
+        font-size:1.34rem;
+        line-height:1.2;
+        letter-spacing:-.35px;
+    }
+
+    .dashboard-header p{
+        margin-top:4px;
+        font-size:.76rem;
+    }
+
+    .dashboard-badge{
+        margin-top:9px;
+        padding:7px 10px;
+        font-size:.67rem;
+        max-width:100%;
+    }
+
+    /* KPI tetap 2 kolom agar tidak terlalu panjang */
+    .dashboard-summary{
+        --bs-gutter-x:.55rem;
+        --bs-gutter-y:.55rem;
+    }
+
+    .summary-card{
+        min-height:82px;
+        padding:11px;
+        gap:9px;
+        border-radius:13px;
+    }
+
+    .summary-icon{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+        border-radius:11px;
+        font-size:.9rem;
+    }
+
+    .summary-label{
+        font-size:.60rem;
+        line-height:1.25;
+        letter-spacing:.025em;
+    }
+
+    .summary-value{
+        margin-top:2px;
+        font-size:.91rem;
+        line-height:1.18;
+        white-space:normal;
+        word-break:break-word;
+    }
+
+    .dashboard-section{
+        margin-top:12px;
+        border-radius:15px;
+    }
+
+    .dashboard-section > .section-title{
+        padding:12px;
+    }
+
+    .dashboard-section > .monthly-card,
+    .dashboard-section > .component-grid,
+    .dashboard-section > .dashboard-table-wrap,
+    .dashboard-section > #diagramAkunBelanjaDashboard{
+        margin:0 9px 9px;
+    }
+
+    .section-title{
+        gap:8px;
+    }
+
+    .section-title h4{
+        font-size:.90rem;
+        line-height:1.25;
+        gap:6px;
+    }
+
+    .section-title h4 i{
+        width:28px;
+        height:28px;
+        flex:0 0 28px;
+        border-radius:8px;
+        font-size:.8rem;
+    }
+
+    .section-title p{
+        margin-top:6px;
+        padding-left:0;
+        font-size:.67rem;
+        line-height:1.4;
+    }
+
+    .section-count{
+        align-self:flex-start;
+        font-size:.62rem;
+        padding:5px 8px;
+    }
+
+    /* Grafik: scroll horizontal halus, tinggi tetap proporsional */
+    .monthly-card{
+        min-height:238px;
+        padding:9px 7px 0;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .monthly-chart{
+        min-width:620px;
+        height:218px;
+        gap:7px;
+    }
+
+    .month-value{
+        font-size:.57rem;
+    }
+
+    .month-bar-area{
+        height:160px;
+    }
+
+    .month-name{
+        font-size:.64rem;
+    }
+
+    /* Kartu komponen menjadi 1 kolom penuh */
+    .component-grid{
+        --bs-gutter-x:.5rem;
+        --bs-gutter-y:.5rem;
+    }
+
+    .component-card{
+        min-height:auto;
+        padding:12px;
+        border-radius:12px;
+    }
+
+    .component-card-title{
+        gap:8px;
+        padding-bottom:8px;
+        margin-bottom:8px;
+    }
+
+    .component-card-title h5{
+        font-size:.76rem;
+        line-height:1.35;
+    }
+
+    .component-icon{
+        width:30px;
+        height:30px;
+        flex-basis:30px;
+    }
+
+    .metric-item{
+        font-size:.68rem;
+    }
+
+    .metric-item strong{
+        font-size:.70rem;
+    }
+
+    .progress-label{
+        font-size:.66rem;
+    }
+
+    /* Tabel jelas dengan horizontal scroll, bukan dipaksa terlalu kecil */
+    .dashboard-table{
+        min-width:700px;
+        font-size:.68rem;
+    }
+
+    .dashboard-table thead th{
+        padding:8px;
+        font-size:.63rem;
+    }
+
+    .dashboard-table td{
+        padding:7px 8px;
+    }
+
+    .component-group-label{
+        font-size:.56rem;
+        padding:3px 6px;
+    }
+
+    /* Diagram akun: tiap akun tetap lengkap dan mudah dibaca */
+    .akun-chart-card{
+        border-radius:13px;
+        margin-bottom:10px;
+    }
+
+    .akun-chart-header{
+        display:block;
+        padding:11px 12px;
+    }
+
+    .akun-chart-count{
+        display:inline-block;
+        margin-top:7px;
+        font-size:.61rem;
+    }
+
+    .akun-chart-grid{
+        padding:9px;
+        gap:8px;
+    }
+
+    .akun-mini-chart{
+        padding:10px;
+        border-radius:10px;
+    }
+
+    .akun-mini-chart-title strong{
+        font-size:.73rem;
+    }
+
+    .akun-mini-chart-title span{
+        font-size:.60rem;
+    }
+
+    .akun-bar-row{
+        grid-template-columns:1fr;
+        gap:4px;
+    }
+
+    .akun-bar-label{
+        font-size:.61rem;
+        -webkit-line-clamp:3;
+    }
+
+    .akun-bar-track{
+        width:calc(100% - 4px);
+        min-height:20px;
+        margin-right:4px;
+    }
+
+    .akun-bar{
+        height:20px;
+    }
+
+    .akun-bar span{
+        font-size:.56rem;
+    }
+
+    .akun-bar-outside{
+        font-size:.56rem;
+        left:auto;
+        right:5px;
+        color:#334155;
+        z-index:2;
+    }
+}
+
+/* Layar sangat kecil */
+@media (max-width: 380px){
+    .sidebar li{
+        padding:8px 9px;
+        font-size:.68rem;
+    }
+
+    .summary-card{
+        padding:10px;
+        gap:7px;
+    }
+
+    .summary-icon{
+        width:34px;
+        height:34px;
+        flex-basis:34px;
+    }
+
+    .summary-label{
+        font-size:.55rem;
+    }
+
+    .summary-value{
+        font-size:.83rem;
+    }
+
+    .dashboard-header h2{
+        font-size:1.22rem;
+    }
+}
